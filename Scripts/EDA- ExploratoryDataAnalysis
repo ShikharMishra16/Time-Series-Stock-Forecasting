@@ -1,1 +1,38 @@
-df
+import pandas as pd
+import matplotlib.pyplot as plt
+from statsmodels.tsa.seasonal import seasonal_decompose
+
+df = pd.read_csv(r"C:\Users\shikh\Desktop\TIME SERIES STOCK PROJECT\1.DataCollection\AAPL.csv", parse_dates=['Date'], index_col='Date')
+#closing rates
+plt.figure(figsize=(12,6))
+df['Close'].plot(title='AAPL Closing Price Over Time')
+plt.xlabel('Date')
+plt.ylabel('Close Price')
+plt.grid()
+plt.savefig('AAPL_closing_price.png')
+plt.show()
+
+#30&90 day Moving Averages
+df['MA30'] = df['Close'].rolling(window=30).mean()
+df['MA90'] = df['Close'].rolling(window=90).mean()
+df[['Close', 'MA30', 'MA90']].plot(figsize=(12,6), title='Moving Averages (30, 90 Days)')
+plt.grid()
+plt.savefig('AAPL_moving_averages.png')
+plt.show()
+
+#RollingStdDevN-Volatility
+df['Rolling_STD'] = df['Close'].rolling(window=30).std()
+df['Rolling_STD'].plot(figsize=(12,6), title='30-Day Rolling Std Deviation (Volatility)')
+plt.grid()
+plt.savefig('AAPL_volatility.png')
+plt.show()
+
+#seasonalDecomp.
+try:
+    decomp = seasonal_decompose(df['Close'], model='additive', period=365)
+    fig = decomp.plot()
+    fig.set_size_inches(12, 8)
+    plt.savefig('AAPL_decomposition.png')
+    plt.show()
+except Exception as e:
+    print(f"Decomposition failed: {e}")
