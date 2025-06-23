@@ -12,7 +12,7 @@ raw_df = yf.download(ticker, start=start_date, end=end_date, auto_adjust=False)
 raw_df.to_csv("raw_data.csv")
 print("Raw data downloaded.")
 
-# CLEAN
+#CLEAN
 df = raw_df.copy()
 df.reset_index(inplace=True)
 df.dropna(inplace=True)
@@ -25,7 +25,7 @@ cleaned_df = df[['Close', 'High', 'Low']]
 cleaned_df.to_csv("cleaned_data.csv")
 print("Data cleaned.")
 
-# NORMALISING
+#NORMALISING
 minmax_scaler = MinMaxScaler()
 normalized = pd.DataFrame(minmax_scaler.fit_transform(cleaned_df),
                           columns=['Close_Norm', 'High_Norm', 'Low_Norm'],
@@ -41,7 +41,7 @@ standardized = pd.DataFrame(standard_scaler.fit_transform(cleaned_df),
 standardized.to_csv("standardized_data.csv")
 print("Standardized data.")
 
-# DETECTING STATIONARITY
+#DETECTING STATIONARITY
 print("\nStationarity Test Results (ADF Test):")
 for col in cleaned_df.columns:
     result = adfuller(cleaned_df[col])
