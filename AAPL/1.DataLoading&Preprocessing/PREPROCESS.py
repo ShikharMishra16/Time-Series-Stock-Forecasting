@@ -49,9 +49,9 @@ for col in cleaned_df.columns:
     print(f"ADF Statistic: {result[0]:.4f}")
     print(f"p-value: {result[1]:.4f}")
     if result[1] < 0.05:
-        print("✅ Likely Stationary")
+        print("Likely Stationary")
     else:
-        print("⚠️  Likely Non-Stationary")
+        print("Likely Non-Stationary")
 plt.legend()
 plt.grid(True)
 plt.tight_layout()
