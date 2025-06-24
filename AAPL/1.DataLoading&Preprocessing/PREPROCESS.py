@@ -26,7 +26,7 @@ cleaned_df.to_csv("cleaned_data.csv")
 print("Data cleaned.")
 
 #NORMALISING
-minmax_scaler = MinMaxScaler()
+minmax_scaler = MinMaxScaler(feature_range=(0,1))
 normalized = pd.DataFrame(minmax_scaler.fit_transform(cleaned_df),
                           columns=['Close_Norm', 'High_Norm', 'Low_Norm'],
                           index=cleaned_df.index)
@@ -56,3 +56,5 @@ plt.legend()
 plt.grid(True)
 plt.tight_layout()
 plt.show()
+# Step 8: Show the first few rows
+print(normalized.head())
