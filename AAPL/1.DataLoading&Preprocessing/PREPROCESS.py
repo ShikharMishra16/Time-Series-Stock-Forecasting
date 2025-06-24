@@ -2,13 +2,8 @@ import yfinance as yf
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from statsmodels.tsa.stattools import adfuller
-import matplotlib.pyplot as plt
 
-ticker="AAPL"  
-startD="2015-01-01"
-endD="2024-12-31"
-
-raww=yf.download(ticker,start=startD,end=endD,auto_adjust=False)
+raww=yf.download("AAPL" ,start="2015-01-01",end="2024-12-31",auto_adjust=False)
 raww.to_csv("rawD.csv")
 #CLEAN
 Data=raww.copy()
@@ -40,8 +35,8 @@ for col in CleanedD.columns:
     print(f"Adfuller Statistic:{result[0]:.4f}")
     print(f"p-value:{result[1]:.4f}")
     if result[1]<0.05:
-        print("This Stock is Stationary!")
-    else:
-        print("This Stock is Non-Stationary!")
+        print("This Stock is Stationary.")
+    if result[1]>=0.05:
+        print("This Stock is Non-Stationary.")
 #first few rows
 print(normalized.head())
