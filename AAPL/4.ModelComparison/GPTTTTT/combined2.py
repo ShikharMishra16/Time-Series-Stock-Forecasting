@@ -8,31 +8,24 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from prophet import Prophet
 from statsmodels.tsa.stattools import adfuller
 from statsmodels.tsa.statespace.sarimax import SARIMAX
-import yfinance as yf
 
-st.set_page_config(page_title="📈 Unified Time Series Forecasting", layout="wide")
-st.title("📊 Unified Forecasting Dashboard (ARIMA • SARIMA • Prophet)")
+st.set_page_config(page_title="📈 Time Series Forecasting", layout="wide")
+st.title("📊 Forecasting Dashboard (ARIMA • SARIMA • Prophet)")
 
-st.sidebar.header("Upload CSV or Fetch From Ticker")
-upload_option = st.sidebar.radio("Data Source", ["Upload CSV", "Yahoo Finance"])
+st.sidebar.header("📂 Upload Time Series CSV")
+uploaded = st.sidebar.file_uploader("Upload CSV with 'Date' and 'Close' columns", type=["csv"])
 
-df = None
-if upload_option == "Upload CSV":
-    uploaded = st.sidebar.file_uploader("Upload CSV with 'Date' and 'Close'", type=["csv"])
-    if uploaded:
-        df = pd.read_csv(uploaded)
-        df['Date'] = pd.to_datetime(df['Date'], dayfirst=True, errors='coerce')
-        df.dropna(subset=['Date'], inplace=True)
-        df.set_index('Date', inplace=True)
-else:
-    ticker = st.sidebar.text_input("Enter Ticker (e.g., AAPL)", value="AAPL")
-    period = st.sidebar.selectbox("Select Period", ["1y", "2y", "5y"], index=0)
-    if st.sidebar.button("Fetch Data"):
-        df = yf.download(ticker, period=period)[['Close']]
-        df.dropna(inplace=True)
+if uploaded:
+    df = pd.read_csv(uploaded)
+    df['Date'] = pd.to_datetime(df['Date'], dayfirst=True, errors='coerce')
+    df.dropna(subset=['Date'], inplace=True)
+    df.set_index('Date', inplace=True)
 
-if df is not None and 'Close' in df.columns:
-    st.subheader("📁 Raw Time Series Data")
+    if 'Close' not in df.columns:
+        st.error("CSV must have a 'Close' column.")
+        st.stop()
+
+    st.subheader("📁 Uploaded Data")
     st.line_chart(df['Close'])
 
     forecast_days = st.slider("Forecast Horizon (days)", 30, 180, 60, step=10)
@@ -40,7 +33,7 @@ if df is not None and 'Close' in df.columns:
     tab1, tab2, tab3 = st.tabs(["ARIMA", "SARIMA", "Prophet"])
 
     with tab1:
-        st.subheader("🔮 ARIMA Forecasting")
+        st.subheader("🔮 ARIMA Forecast")
         series = df['Close']
         train = series[:-forecast_days]
         test = series[-forecast_days:]
@@ -68,8 +61,7 @@ if df is not None and 'Close' in df.columns:
         col5.metric("Accuracy", f"{accuracy:.2f}%")
 
     with tab2:
-        st.subheader("📈 SARIMA Forecasting")
-
+        st.subheader("📈 SARIMA Forecast")
         log_series = np.log(df['Close'])
         d_order = 0
         while d_order < 3:
@@ -109,8 +101,7 @@ if df is not None and 'Close' in df.columns:
         col5.metric("Accuracy", f"{accuracy:.2f}%")
 
     with tab3:
-        st.subheader("📅 Prophet Forecasting")
-
+        st.subheader("📅 Prophet Forecast")
         prophet_df = df.reset_index()[['Date', 'Close']]
         prophet_df.columns = ['ds', 'y']
         m = Prophet()
@@ -139,4 +130,6 @@ if df is not None and 'Close' in df.columns:
         col5.metric("Accuracy", f"{accuracy:.2f}%")
 
 else:
+    st.info("👈 Please upload a CSV to begin.")
+
     st.info("👈 Upload a dataset or fetch from ticker to begin.")
